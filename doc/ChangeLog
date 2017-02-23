@@ -1,0 +1,125 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ChangeLog 8463 2014-06-24 01:53:04Z cpo@SLAC.STANFORD.EDU $
+#
+# Description:
+#  ChangeLog file for package psmon
+#------------------------------------------------------------------------
+
+Package author: Dan Damiani
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag V00-02-00
+2017-02-16 Dan Damiani
+- Updated to support python 3
+- Deleted old, non-functional examples
+
+Tag: V00-01-19
+2016-10-26 Dan Damiani
+- Fix for colorbar slider range auto-adjusting even when auto-ranging was disabled
+
+Tag: V00-01-18
+2016-09-12 Dan Damiani
+- Fix for ipc socket bind issues on newer versions of zmq
+
+Tag: V00-01-17
+2016-08-11 Dan Damiani
+- Allow list objects to be used for XYPlot and Hist data
+- All psmon servers now publish a list of know topics 
+
+Tag: V00-01-16
+2016-07-14 Dan Damiani
+- Added option for z-axis auto-ranging
+- Plot titles now update when changed after the initial plot is received
+
+Tag: V00-01-15
+2016-07-11 Dan Damiani
+- Improved helper classes in the 'plotting' module
+- Nested multiplots now add a title for the entire nested multiplot
+- Fix a bug when specifying format options for x and y labels
+
+Tag: V00-01-14
+2016-07-07 Dan Damiani
+- Suppress confusing info printouts that occur when first importing mpi
+- Fix for bug when creating a multiplot of multiplots
+
+Tag: V00-01-13
+2015-10-28 Dan Damiani
+- Modify behavior of the local plots functionality to better handle
+  keyboard interrupts when run in ipython
+
+Tag: V00-01-12
+2015-08-10 Dan Damiani
+- Fix a missing-import bug with the HistHelper and HistOverlayHelper classes
+- Fix a bug with the matplotlib client and newer versions of matplotlib
+- Hist objects in pyqtgraph now use the standard PlotDataItem interface
+- Add offsets to text in legends
+- Add scripts for testing psmon plotting features
+
+Tag: V00-01-11
+2015-07-31 Dan Damiani
+- Added a strip chart helper class
+- Helper classes moved into their own helper module
+- IPython embed feature used for psconsole tool
+- Fixed several bugs with request listener in publish module
+
+Tag: V00-01-10
+2015-05-24 Dan Damiani
+- Bug fix for plotting directly from within one script
+
+Tag: V00-01-09
+2015-05-14 Dan Damiani
+- Support for plotting directly from within one script (no
+  separate client script needed).
+
+Tag: V00-01-08
+2015-05-11 Dan Damiani
+- Add a console app (psconsole) for talking to psmon servers.
+- Add legends for xyplot and 1d histograms.
+- Cli options for forcing log scale added to psplot.
+- Fill coloring is now configurable for 1d histograms.
+- Several bug fixes related to value-display mouseover tooltips.
+
+Tag: V00-01-07
+2015-02-02 Dan Damiani
+- Add user-definable axes for image plot
+
+Tag: V00-01-06
+2014-11-26 Christopher O'Grady and Dan Damiani
+- Add auto-initialization
+
+Tag: V00-01-05
+2014-11-26 Christopher O'Grady
+- Improvements from Dan: when hovering over an Image or XYPlot,
+  get X,Y,(Z) coordinates displayed.  Also generalize information
+  that user can send on the "communication" port to all python
+  objects.
+
+Tag: V00-01-04
+2014-10-29 Christopher O'Grady
+- Fix from Dan that prevents psplot from "falling behind" when
+  ZMQ buffers on the client (display side) fill up.
+
+Tag: V00-01-03
+2014-10-22 Christopher O'Grady
+- Support making plots without symbols (only lines).  Add histogram support.
+
+Tag: V00-01-02
+2014-09-29 Christopher O'Grady
+- Add Anton Lindahl's simple multiplot example
+
+Tag: V00-01-01
+2014-09-29 Christopher O'Grady
+- Add support for MultiPlots, Histograms and matplotlib-style
+  strings to set symbol types in overlay plots.
+
+Tag: V00-01-00
+2014-07-23 Christopher O'Grady
+- Many improvements to the interface and functionality.  This
+  feels like the first real official version.
+
+Tag: V00-00-01
+2014-06-25 Christopher O'Grady
+- First tag of Dan's psmon
