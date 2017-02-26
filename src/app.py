@@ -223,6 +223,10 @@ class ZMQPublisher(object):
 
     def _initialize_icp(self):
         try:
+            # some versions of zmq are silly...
+            # need this environment variable set to create ipc socket in /tmp instead of some random directory
+            if 'TMP' not in os.environ:
+                os.environ["TMP"] = "/tmp"
             self.data_socket.bind('ipc://*')
             self.comm_socket.bind('ipc://*')
             LOG.info('Initialized publisher. Data socket %s, Comm socket: %s', str(self.data_endpoint), self.comm_endpoint)
