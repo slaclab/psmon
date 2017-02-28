@@ -3,8 +3,11 @@ import re
 import sys
 import zmq
 import pwd
+import atexit
 import socket
+import shutil
 import logging
+import tempfile
 import threading
 from collections import namedtuple
 # Queue module changed to queue in py3
@@ -123,9 +126,11 @@ class ZMQPublisher(object):
         self.proxy_thread = threading.Thread(target=self._send_proxy)
         self.comm_offset = comm_offset
         self.initialized = False
+        self.tempdir = None
         self.cache = {
             config.APP_TOPIC_LIST: []
         }
+        atexit.register(self._clean_tmpdir)
 
     @property
     def data_endpoint(self):
@@ -223,12 +228,9 @@ class ZMQPublisher(object):
 
     def _initialize_icp(self):
         try:
-            # some versions of zmq are silly...
-            # need this environment variable set to create ipc socket in /tmp instead of some random directory
-            if 'TMP' not in os.environ:
-                os.environ["TMP"] = "/tmp"
-            self.data_socket.bind('ipc://*')
-            self.comm_socket.bind('ipc://*')
+            self.tempdir = tempfile.mkdtemp()
+            self.data_socket.bind('ipc://%s/data'%self.tempdir)
+            self.comm_socket.bind('ipc://%s/comm'%self.tempdir)
             LOG.info('Initialized publisher. Data socket %s, Comm socket: %s', str(self.data_endpoint), self.comm_endpoint)
             return True
         except zmq.ZMQError:
@@ -276,6 +278,10 @@ class ZMQPublisher(object):
 
     def _unbind(self, sock, port):
         sock.unbind('tcp://*:%d' % port)
+
+    def _clean_tmpdir(self):
+        if os.path.exists(self.tempdir):
+            shutil.rmtree(self.tempdir)
 
 
 class ZMQSubscriber(object):
