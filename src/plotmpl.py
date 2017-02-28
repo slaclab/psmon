@@ -41,7 +41,10 @@ class PlotClient(object):
         if 'figax' in kwargs:
             self.figure, self.ax = kwargs['figax']
         else:
-            self.figure, self.ax = plt.subplots(facecolor=info.bkg_col, edgecolor=info.bkg_col, subplot_kw={'axis_bgcolor': info.bkg_col or config.MPL_AXES_BKG_COLOR})
+            self.figure, self.ax = plt.subplots(facecolor=info.bkg_col, edgecolor=info.bkg_col)
+            # this is needed for older versions of matplotlib where axis objects don't have set_facecolor
+            if not hasattr(self.ax, 'set_facecolor'):
+                self.ax.set_axis_bgcolor(info.bkg_col or config.MPL_AXES_BKG_COLOR)
             self.figure.canvas.set_window_title(init.title)
         self.info = info
         self.set_title(init.ts)
