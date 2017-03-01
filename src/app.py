@@ -280,7 +280,7 @@ class ZMQPublisher(object):
         sock.unbind('tcp://*:%d' % port)
 
     def _clean_tmpdir(self):
-        if os.path.exists(self.tempdir):
+        if self.tempdir is not None and os.path.exists(self.tempdir):
             shutil.rmtree(self.tempdir)
 
 
