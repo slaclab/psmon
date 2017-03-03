@@ -33,6 +33,50 @@ class Manager(object):
             self._publisher(self.topic, self._data)
 
 
+class MultiPlot(Manager):
+    def __init__(self, topic, title=None, pubrate=None, publisher=None):
+        super(MultiPlot, self).__init__(topic, title, pubrate, publisher)
+        self._nplots = 0
+        self._names = []
+        self._data = plots.MultiPlot(
+            None,
+            self._title,
+            None
+        )
+
+    @property
+    def names(self):
+        return self._names
+
+    @property
+    def size(self):
+        return self._nplots
+
+    def rename(self, old_name, new_name):
+        self._names[self._get_index(old_name)] = new_name
+
+    def add_plot(self, name, manager):
+        index, new_plot = self._make(name)
+        if new_plot:
+            self._data.add(manager._data)
+        else:
+            self._data.datacon[index] = manager._data
+
+    def _make(self, name):
+        if name in self._names:
+            return self._names.index(name), False
+        index = self._nplots
+        self._names.append(name)
+        self._nplots += 1
+        return index, True
+
+    def _get_index(self, name):
+        if name in self._names:
+            return self._names.index(name)
+        else:
+            raise KeyError('Unknown plot name: %s'%name)
+
+
 class OverlayManager(Manager):
     def __init__(self, topic, title=None, xlabel=None, ylabel=None, pubrate=None, publisher=None):
         super(OverlayManager, self).__init__(topic, title, pubrate, publisher)
