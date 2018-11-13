@@ -34,14 +34,15 @@ class Manager(object):
 
 
 class MultiPlot(Manager):
-    def __init__(self, topic, title=None, pubrate=None, publisher=None):
+    def __init__(self, topic, title=None, ncolumns=None, pubrate=None, publisher=None):
         super(MultiPlot, self).__init__(topic, title, pubrate, publisher)
         self._nplots = 0
         self._names = []
         self._data = plots.MultiPlot(
             None,
             self._title,
-            None
+            None,
+            ncolumns
         )
 
     @property
