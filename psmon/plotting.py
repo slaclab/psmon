@@ -238,7 +238,7 @@ class StripChart(OverlayManager):
 
     def clear(self, name=None):
         if name is None:
-            for index in xrange(self._noverlay):
+            for index in range(self._noverlay):
                 self._indices[index] = 0
                 self._index_zeros[index] = 0
                 self._data.xdata[index] = self._xdata[index][:self._indices[index]]
@@ -298,7 +298,7 @@ class LinePlot(OverlayManager):
 
     def clear(self, name=None):
         if name is None:
-            for index in xrange(self._noverlay):
+            for index in range(self._noverlay):
                 self._xdata[index] = np.zeros(0)
                 self._ydata[index] = np.zeros(0)
         else:
@@ -368,7 +368,7 @@ class ScatterPlot(OverlayManager):
 
     def clear(self, name=None):
         if name is None:
-            for index in xrange(self._noverlay):
+            for index in range(self._noverlay):
                 self._indices[index] = 0
                 self._data.xdata[index] = self._xdata[index][:self._indices[index]]
                 self._data.ydata[index] = self._ydata[index][:self._indices[index]]
