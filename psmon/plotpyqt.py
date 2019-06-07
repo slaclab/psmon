@@ -280,7 +280,7 @@ class ImageClient(PlotClient):
 
     def cursor_hover_evt_sub(self, x_pos, y_pos):
         if 0 <= x_pos < self.im.image.shape[0] and 0 <= y_pos < self.im.image.shape[1]:
-            z_val = self.im.image[x_pos][y_pos]
+            z_val = self.im.image[int(x_pos)][int(y_pos)]
             # for image of float type show decimal places
             if hasattr(z_val, 'dtype') and np.issubdtype(z_val, np.integer):
                 label_str = 'x=%d, y=%d, z=%d'
