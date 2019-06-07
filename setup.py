@@ -9,7 +9,6 @@ setup(
     author='Daniel Damiani',
     author_email='ddamiani@slac.stanford.edu',
     url='https://confluence.slac.stanford.edu/display/PSDM/psana+-+Python+Script+Analysis+Manual#psana-PythonScriptAnalysisManual-Real-timeOnlinePlotting/Monitoring',
-    package_dir={'psmon': 'src'},
     packages=['psmon'],
     install_requires=[
         'numpy',
