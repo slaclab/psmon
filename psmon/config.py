@@ -2,19 +2,19 @@ import sys
 import logging
 from collections import namedtuple
 
-### COORDINATE TUPLE USED FOR CONFIGS ###
+# COORDINATE TUPLE USED FOR CONFIGS
 Resolution = namedtuple('Resolution', 'x y')
-### CONFIG KEYS FOR SERVER ###
+# CONFIG KEYS FOR SERVER
 RESET_REQ_HEADER = 'reset'
 RESET_REQ_STR = 'reset signal - %s'
 RESET_REP_STR = 'reset signal recieved from %s'
 ZMQ_TOPIC_DELIM_CHAR = '\x00'
-### CONFIG KEYS FOR LOGGING ###
+# CONFIG KEYS FOR LOGGING
 LOG_BASE_NAME = __package__
 LOG_LEVEL = 'INFO'
 LOG_LEVEL_ROOT = logging.WARN
-LOG_FORMAT = '[%(levelname)-8s] %(message)s' #'%(asctime)s:%(levelname)s:%(message)s'
-### GENERAL APP CONFIG ###
+LOG_FORMAT = '[%(levelname)-8s] %(message)s'  # '%(asctime)s:%(levelname)s:%(message)s'
+# GENERAL APP CONFIG
 APP_INTERACTIVE = False
 if hasattr(sys, 'ps1'):
     APP_INTERACTIVE = True
@@ -45,7 +45,7 @@ APP_AUTO_ZRANGE = False
 APP_LOG = False
 APP_RESERVED_TOPIC = 'psmon-internal'
 APP_TOPIC_LIST = APP_RESERVED_TOPIC + '-topics'
-### PYQT DEFAULT APPEARANCE CONFIG ###
+# PYQT DEFAULT APPEARANCE CONFIG
 PYQT_SMALL_WIN = Resolution(640, 480)
 PYQT_LARGE_WIN = Resolution(3840, 2880)
 PYQT_BORDERS = {'color': (150, 150, 150), 'width': 1.0}
@@ -64,8 +64,8 @@ PYQT_USE_WEAVE = False
 PYQT_USE_ALT_IMG_ORIGIN = True
 PYQT_MOUSE_EVT_RATELIMIT = 30
 PYQT_GRID_LINE_ALPHA = None
-PYQT_LEGEND_FORMAT =  "<div style='margin-left:10px;'>%s</div>"
-### MPL DEFAULT APPEARANCE CONFIG ###
+PYQT_LEGEND_FORMAT = "<div style='margin-left:10px;'>%s</div>"
+# MPL DEFAULT APPEARANCE CONFIG
 MPL_SMALL_WIN = Resolution(8, 6)
 MPL_LARGE_WIN = Resolution(32, 24)
 MPL_COLOR_PALETTE = 'hot'

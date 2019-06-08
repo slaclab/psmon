@@ -1,16 +1,14 @@
 import sys
-import socket
 import logging
-import threading
 
 from psmon import app, config, util
 
 # Suppress mpi setup output
 with util.redirect_stdout():
-  import pyqtgraph as pg
-  from pyqtgraph.Qt import QtCore, QtGui
-  import psmon.plotpyqt as psplot
-  from psmon.plotpyqt import PyQtClientTypeError
+    import pyqtgraph as pg
+    from pyqtgraph.Qt import QtCore, QtGui
+    import psmon.plotpyqt as psplot
+    from psmon.plotpyqt import PyQtClientTypeError
 
 
 LOG = logging.getLogger(__name__)
@@ -20,8 +18,8 @@ def set_color_opt(option, value):
     if value is not None:
         try:
             pg.setConfigOption(option, pg.functions.colorTuple(pg.functions.Color(value)))
-        except:
-             LOG.warning('Inavlid %s color for pyqtgraph: %s', option, value)
+        except Exception:
+            LOG.warning('Inavlid %s color for pyqtgraph: %s', option, value)
 
 
 def main(client_info, plot_info):
@@ -72,7 +70,7 @@ def main(client_info, plot_info):
         return 1
 
     # define signal sender function
-    reset_req = app.ZMQRequester(zmqsub.comm_socket)
+    #reset_req = app.ZMQRequester(zmqsub.comm_socket)
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()

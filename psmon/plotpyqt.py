@@ -5,10 +5,10 @@ import collections
 import numpy as np
 
 import pyqtgraph as pg
-from pyqtgraph.Qt import QtCore, QtGui
+from pyqtgraph.Qt import QtCore
 
 from psmon import config
-from psmon.util import is_py_iter, arg_inflate_tuple, window_ratio, merge_dicts, check_data
+from psmon.util import arg_inflate_tuple, window_ratio, merge_dicts, check_data
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 from psmon.format import parse_fmt_xyplot, parse_fmt_hist, parse_fmt_leg
 
@@ -118,7 +118,7 @@ class PlotClient(object):
                 self.fig_win.setWindowTitle(title)
             else:
                 # first item of the title_layout is the textbox
-                self.title_layout.getItem(0,0).setText(title, size='11pt', bold=True)
+                self.title_layout.getItem(0, 0).setText(title, size='11pt', bold=True)
             self.title = title
 
     def set_title(self, title):
@@ -144,8 +144,8 @@ class PlotClient(object):
         """
         if isinstance(axis_label_data, collections.Mapping):
             arg_list = ['text', 'units', 'unitPrefix']
-            axis_args = [ axis_label_data.get(value, None) for value in arg_list ]
-            axis_kwargs = { key: value for key, value in axis_label_data.items() if key not in arg_list }
+            axis_args = [axis_label_data.get(value, None) for value in arg_list]
+            axis_kwargs = {key: value for key, value in axis_label_data.items() if key not in arg_list}
             if axis_kwargs:
                 axis_kwargs = merge_dicts(config.PYQT_AXIS_FMT, axis_kwargs)
             self._set_title_axis(axis_name, *axis_args, **axis_kwargs)
@@ -170,7 +170,7 @@ class PlotClient(object):
         two options fight each other.
         """
         if ratio is None:
-            ratio=self.info.aspect
+            ratio = self.info.aspect
 
         # Since the images are technically transposed this is needed for the ratio to work the same as mpl
         if ratio is not None:
@@ -242,7 +242,8 @@ class ImageClient(PlotClient):
             if self.info.palette in pg.graphicsItems.GradientEditorItem.Gradients:
                 cm = self.info.palette
             else:
-                LOG.warning('Inavlid color palette for pyqtgraph: %s - Falling back to default: %s', self.info.palette, cm)
+                LOG.warning('Inavlid color palette for pyqtgraph: %s - Falling back to default: %s',
+                            self.info.palette, cm)
         self.cb.gradient.loadPreset(cm)
 
         # Set up colorbar ranges if specified
@@ -268,8 +269,8 @@ class ImageClient(PlotClient):
                 self.set_aspect(self.aspect_lock, self.aspect_ratio)
             self.im.setImage(data.image.T, autoLevels=self.info.auto_zrange)
             if self.info.auto_zrange:
-              self.cb.setLevels(*self.im.getLevels())
-              self.cb.setHistogramRange(*self.cb.getLevels())
+                self.cb.setLevels(*self.im.getLevels())
+                self.cb.setHistogramRange(*self.cb.getLevels())
             if data.pos is not None and data.pos != self.im_pos:
                 self.im.setPos(*data.pos)
                 self.im_pos = data.pos
@@ -289,15 +290,15 @@ class ImageClient(PlotClient):
             self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
 
     def cursor_hover_hevt_sub(self, z_val):
-            img_z, img_n = self.im.getHistogram()
-            index = np.searchsorted(img_z, z_val, side="right")-1
-            if 0 <= index < img_n.shape[0]:
-                z_low = img_z[index]
-                if index + 1 < img_n.shape[0]:
-                    z_high = img_z[index+1]
-                else:
-                    z_high = 2 * img_z[index] - img_z[index-1]
-                self.info_label.setText('z=(%.5g, %.5g), n=%d' % (z_low, z_high, img_n[index]), size='10pt')
+        img_z, img_n = self.im.getHistogram()
+        index = np.searchsorted(img_z, z_val, side="right")-1
+        if 0 <= index < img_n.shape[0]:
+            z_low = img_z[index]
+            if index + 1 < img_n.shape[0]:
+                z_high = img_z[index+1]
+            else:
+                z_high = 2 * img_z[index] - img_z[index-1]
+            self.info_label.setText('z=(%.5g, %.5g), n=%d' % (z_low, z_high, img_n[index]), size='10pt')
 
     def cursor_hover_evt(self, evt):
         pos = evt[0]
@@ -308,20 +309,28 @@ class ImageClient(PlotClient):
             mouse_pos = self.cb.vb.mapSceneToView(pos)
             self.cursor_hover_hevt_sub(mouse_pos.y())
 
+
 class XYPlotClient(PlotClient):
     def __init__(self, init_plot, framegen, info, rate=1, **kwargs):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate, **kwargs)
         self.plots = []
         self.formats = []
         self.add_legend(init_plot.leg_label, init_plot.leg_offset)
-        for xdata, ydata, format_val, legend in arg_inflate_tuple(1, check_data(init_plot.xdata), check_data(init_plot.ydata), init_plot.formats, init_plot.leg_label):
+        inflated_args = arg_inflate_tuple(
+            1,
+            check_data(init_plot.xdata),
+            check_data(init_plot.ydata),
+            init_plot.formats,
+            init_plot.leg_label
+        )
+        for xdata, ydata, format_val, legend in inflated_args:
             cval = len(self.plots)
             self.formats.append((format_val, cval))
             self.plots.append(
                 self.plot_view.plot(
                     x=xdata,
                     y=ydata,
-                    name=config.PYQT_LEGEND_FORMAT%legend,
+                    name=config.PYQT_LEGEND_FORMAT % legend,
                     **parse_fmt_xyplot(format_val, cval)
                 )
             )
@@ -331,7 +340,13 @@ class XYPlotClient(PlotClient):
         Updates the data in the plot - none means their was no update for this interval
         """
         if data is not None:
-            for index, (plot, data_tup, format_tup) in enumerate(zip(self.plots, arg_inflate_tuple(1, check_data(data.xdata), check_data(data.ydata), data.formats), self.formats)):
+            inflated_args = arg_inflate_tuple(
+                1,
+                check_data(data.xdata),
+                check_data(data.ydata),
+                data.formats
+            )
+            for index, (plot, data_tup, format_tup) in enumerate(zip(self.plots, inflated_args, self.formats)):
                 xdata, ydata, new_format = data_tup
                 old_format, cval = format_tup
                 if new_format != old_format:
@@ -348,7 +363,14 @@ class HistClient(PlotClient):
         self.hists = []
         self.formats = []
         self.add_legend(init_hist.leg_label, init_hist.leg_offset)
-        for bins, values, format_val, fill_val, legend in arg_inflate_tuple(1, check_data(init_hist.bins), check_data(init_hist.values), init_hist.formats, init_hist.fills, init_hist.leg_label):
+        inflated_args = arg_inflate_tuple(
+            1,
+            check_data(init_hist.bins),
+            check_data(init_hist.values),
+            init_hist.formats, init_hist.fills,
+            init_hist.leg_label
+        )
+        for bins, values, format_val, fill_val, legend in inflated_args:
             cval = len(self.hists)
             fillLevel = 0 if fill_val else None
             self.formats.append((format_val, fill_val, cval))
@@ -356,7 +378,7 @@ class HistClient(PlotClient):
                 self.plot_view.plot(
                     x=bins,
                     y=values,
-                    name=config.PYQT_LEGEND_FORMAT%legend,
+                    name=config.PYQT_LEGEND_FORMAT % legend,
                     stepMode=True,
                     fillLevel=fillLevel,
                     **parse_fmt_hist(format_val, fill_val, cval)
@@ -368,7 +390,14 @@ class HistClient(PlotClient):
         Updates the data in the histogram - none means their was no update for this interval
         """
         if data is not None:
-            for index, (hist, data_tup, format_tup) in enumerate(zip(self.hists, arg_inflate_tuple(1, check_data(data.bins), check_data(data.values), data.formats, data.fills), self.formats)):
+            inflated_args = arg_inflate_tuple(
+                1,
+                check_data(data.bins),
+                check_data(data.values),
+                data.formats,
+                data.fills
+            )
+            for index, (hist, data_tup, format_tup) in enumerate(zip(self.hists, inflated_args, self.formats)):
                 bins, values, new_format, new_fill = data_tup
                 old_format, old_fill, cval = format_tup
                 if new_format != old_format or new_fill != old_fill:
@@ -407,15 +436,17 @@ class MultiPlotClient(object):
             ratio_calc = window_ratio(config.PYQT_SMALL_WIN, config.PYQT_LARGE_WIN)
             if init.ncols is None:
                 self.fig_win.resize(*ratio_calc(init.size, 1))
-                self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win) for data_obj in init.data_con]
+                self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win)
+                              for data_obj in init.data_con]
             else:
                 self.plots = []
                 if not isinstance(init.ncols, int) or not 0 < init.ncols <= init.size:
                     ncols = init.size
                     nrows = 1
-                    LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s',
-                                    init.ncols,
-                                    init.size)
+                    LOG.warning('Invalid column number specified: %s'
+                                ' - Must be a positive integer less than the number of plots: %s',
+                                init.ncols,
+                                init.size)
                 else:
                     ncols = init.ncols
                     nrows = math.ceil(init.size/float(init.ncols))
@@ -439,7 +470,7 @@ class MultiPlotClient(object):
                 self.fig_win.setWindowTitle(title)
             else:
                 # first item of the title_layout is the textbox
-                self.title_layout.getItem(0,0).setText(title, size='11pt', bold=True)
+                self.title_layout.getItem(0, 0).setText(title, size='11pt', bold=True)
             self.title = title
 
     def update(self, data):
