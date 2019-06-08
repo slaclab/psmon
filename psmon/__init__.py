@@ -2,6 +2,9 @@ import logging as pslogging
 from psmon import config
 
 
+__version__ = '1.0.0'
+
+
 def log_level_parse(log_level):
     """
     Parse log level as a string (non-case sensitive) into a log level enum
