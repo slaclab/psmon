@@ -75,7 +75,7 @@ class MultiPlot(Manager):
         if name in self._names:
             return self._names.index(name)
         else:
-            raise KeyError('Unknown plot name: %s'%name)
+            raise KeyError('Unknown plot name: %s' % name)
 
 
 class OverlayManager(Manager):
@@ -121,7 +121,7 @@ class OverlayManager(Manager):
         if name in self._names:
             return self._names.index(name)
         else:
-            raise KeyError('Unknown plot name: %s'%name)
+            raise KeyError('Unknown plot name: %s' % name)
 
 
 class Image(Manager):

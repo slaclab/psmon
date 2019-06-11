@@ -86,9 +86,9 @@ class PlotClient(object):
                 label_str = axis_label_data['axis_title']
                 if 'axis_units' in axis_label_data:
                     if 'axis_units_prefix' in axis_label_data:
-                        label_str += ' [%s%s]'%(axis_label_data['axis_units'], axis_label_data['axis_units_prefix']) 
+                        label_str += ' [%s%s]' % (axis_label_data['axis_units'], axis_label_data['axis_units_prefix'])
                     else:
-                        label_str += ' [%s]'%axis_label_data['axis_units']
+                        label_str += ' [%s]' % axis_label_data['axis_units']
                 axis_label_func(label_str)
         elif axis_label_data is not None:
             axis_label_func(axis_label_data)
@@ -107,7 +107,7 @@ class PlotClient(object):
 
     def set_aspect(self, lock=True, ratio=None):
         if ratio is None:
-            ratio=self.info.aspect
+            ratio = self.info.aspect
         if lock:
             if ratio is not None:
                 self.ax.set_aspect(ratio)
@@ -129,7 +129,8 @@ class PlotClient(object):
         self.ax.grid(show)
 
     def update_plot_data(self, plots, x_vals, y_vals, new_fmts, old_fmts):
-        for index, (plot, data_tup, old_fmt) in enumerate(zip(plots, arg_inflate_tuple(1, check_data(x_vals), check_data(y_vals), new_fmts), old_fmts)):
+        inflated_args = arg_inflate_tuple(1, check_data(x_vals), check_data(y_vals), new_fmts)
+        for index, (plot, data_tup, old_fmt) in enumerate(zip(plots, inflated_args, old_fmts)):
             x_val, y_val, new_fmt = data_tup
             plot.set_data(x_val, y_val)
             if new_fmt != old_fmt:
@@ -162,15 +163,25 @@ class MultiPlotClient(object):
                 ncols = init.ncols
                 nrows = int(math.ceil(init.size/float(init.ncols)))
             else:
-                LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s', init.ncols, init.size)
+                LOG.warning('Invalid column number specified: %s'
+                            ' - Must be a positive integer less than the number of plots: %s',
+                            init.ncols, init.size)
         if init.use_windows:
             LOG.warning('Separate windows for subplots is not supported in the matplotlib client')
         ratio_calc = window_ratio(config.MPL_SMALL_WIN, config.MPL_LARGE_WIN)
-        self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col, figsize=ratio_calc(ncols, nrows), squeeze=False)
+        self.figure, self.ax = plt.subplots(
+            nrows=nrows,
+            ncols=ncols,
+            facecolor=info.bkg_col,
+            edgecolor=info.bkg_col,
+            figsize=ratio_calc(ncols, nrows),
+            squeeze=False
+        )
         # flatten the axes array returned by suplot
         self.ax = self.ax.flatten()
         self.figure.canvas.set_window_title(init.title)
-        self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax)) for data_obj, subax in zip(init.data_con, self.ax)]
+        self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax))
+                      for data_obj, subax in zip(init.data_con, self.ax)]
         self.framegen = framegen
         self.rate_ms = rate * 1000
         self.info = info
@@ -206,7 +217,8 @@ class ImageClient(PlotClient):
             try:
                 cmap = plt.get_cmap(self.info.palette)
             except ValueError:
-                LOG.warning('Inavlid color palette for matplotlib: %s - Falling back to default: %s', self.info.palette, cmap.name)
+                LOG.warning('Inavlid color palette for matplotlib: %s - Falling back to default: %s',
+                            self.info.palette, cmap.name)
         self.im = self.ax.imshow(init_im.image, interpolation=self.info.interpol, cmap=cmap, extent=extent)
         self.im.set_clim(self.info.zrange)
         self.cb = self.figure.colorbar(self.im, ax=self.ax)
@@ -262,12 +274,12 @@ class HistClient(PlotClient):
 
     def correct_bins(self, bins, values):
         """
-        Checks that number of bins is correct for matplotlib. pyqtgraph needs a 
-        trailing bin edge that mpl doesn't so check for that and remove if 
+        Checks that number of bins is correct for matplotlib. pyqtgraph needs a
+        trailing bin edge that mpl doesn't so check for that and remove if
         needed.
 
-        Takes the 'bins' numpy array (single or list of) and compares to the 
-        'values' numpy array (single or list of) and trims trailing entry from 
+        Takes the 'bins' numpy array (single or list of) and compares to the
+        'values' numpy array (single or list of) and trims trailing entry from
         'bins' if its size is greater than that of the mathcing 'values'.
 
         Returns the corrected 'bins'.
@@ -287,13 +299,14 @@ class HistClient(PlotClient):
 
     def fill(self, corrected_bins, values, fills):
         """
-        Adds fill for each histogram based on the boolean 'fills' parameter passed 
+        Adds fill for each histogram based on the boolean 'fills' parameter passed
         with the datagram.
 
-        Takes correct bins (single or list of), histogram values (single or list of), 
+        Takes correct bins (single or list of), histogram values (single or list of),
         and fill configs (single or list of).
         """
-        for bin, val, fill, hist in arg_inflate_tuple(3, check_data(corrected_bins), check_data(values), fills, self.hists):
+        inflated_args = arg_inflate_tuple(3, check_data(corrected_bins), check_data(values), fills, self.hists)
+        for bin, val, fill, hist in inflated_args:
             if fill:
                 self.ax.fill_between(bin, 0, val, color=hist.get_color(), alpha=config.MPL_HIST_ALPHA)
 

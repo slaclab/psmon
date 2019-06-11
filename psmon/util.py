@@ -6,9 +6,9 @@ from itertools import chain
 from contextlib import contextmanager
 # For Python 3 - builtin zip returns generator
 if sys.version_info < (3,):
-  from itertools import izip
+    from itertools import izip
 else:
-  izip = zip
+    izip = zip
 
 
 def is_py_iter(obj):
@@ -117,7 +117,7 @@ def redirect_stdout():
     sys.stderr.flush()
     stdoutfd = os.dup(sys.stdout.fileno())
     stderrfd = os.dup(sys.stderr.fileno())
-    with open(os.devnull,'wb') as devnull:
+    with open(os.devnull, 'wb') as devnull:
         os.dup2(devnull.fileno(), sys.stdout.fileno())
         os.dup2(devnull.fileno(), sys.stderr.fileno())
         try:

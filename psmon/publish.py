@@ -6,20 +6,20 @@ class _Publish(object):
     """
     Class for handling the functionality of the publish module.
 
-    A single instance of this class is created on import of the module. It 
-    then replaces the module reference in sys.modules. 
+    A single instance of this class is created on import of the module. It
+    then replaces the module reference in sys.modules.
 
     Attributes:
-     - local: Used to set the local publishing state of the module. If the local 
-            flag of the publish module is set then all plots are published to 
+     - local: Used to set the local publishing state of the module. If the local
+            flag of the publish module is set then all plots are published to
             a client launched locally.
-     - disabled: Indicates if  autoconnection on send attempts for the publish 
+     - disabled: Indicates if  autoconnection on send attempts for the publish
             module have been disabled.
      - port: The tcp port to use for the ZMQ data connection.
-     - client_opts: An instance of the ClientInfo class that is used for 
+     - client_opts: An instance of the ClientInfo class that is used for
             determining the configuration settings for ZMQ connections.
-     - plot_opts: An instance of the PlotInfo class used by local plotting 
-            clients when launched. Individual clients will not pick up changes 
+     - plot_opts: An instance of the PlotInfo class used by local plotting
+            clients when launched. Individual clients will not pick up changes
             to the plot_opts made after they are spawned.
      - active_clients: Dictionary of current local plot clients.
     """
@@ -31,8 +31,7 @@ class _Publish(object):
             renderer=config.APP_CLIENT,
             rate=config.APP_RATE,
             recv_limit=config.APP_RECV_LIMIT,
-            daemon=config.APP_INTERACTIVE
-        ):
+            daemon=config.APP_INTERACTIVE):
         self.local = local
         self.disabled = False
         self.port = port
@@ -68,11 +67,13 @@ class _Publish(object):
         if not self.initialized and not self.disabled:
             try:
                 with self._redirect():
-                  from mpi4py import MPI
+                    from mpi4py import MPI
                 if MPI.COMM_WORLD.Get_rank() == 0:
                     self.init()
                 else:
-                    raise app.PublishError('Cannot send messages on a non-rank-zero MPI process without explicitly calling publish.init')
+                    raise app.PublishError(
+                        'Cannot send messages on a non-rank-zero MPI process without explicitly calling publish.init'
+                    )
             except ImportError:
                 self.init()
 
@@ -137,7 +138,7 @@ class _Publish(object):
 
     def get_reset_flag(self):
         """
-        Gets the state of the client reset flag. This will be set if any client 
+        Gets the state of the client reset flag. This will be set if any client
         has sent a reset message, and will remain set until cleared.
         """
         return self._reset_listener.get_flag()

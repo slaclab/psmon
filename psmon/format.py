@@ -9,25 +9,25 @@ DOTTED_LINE_CHAR = ':'
 LINE_CONT_CHAR = ['-', '.']
 
 COLOR_LIST = [
-    'b', # blue
-    'g', # green
-    'r', # red
-    'c', # cyan
-    'm', # magenta
-    'y', # yellow
-    'k', # black
-    'w', # white
+    'b',  # blue
+    'g',  # green
+    'r',  # red
+    'c',  # cyan
+    'm',  # magenta
+    'y',  # yellow
+    'k',  # black
+    'w',  # white
 ]
 
 COLOR_RGB_MAP = {
-    'b': (0, 0, 255), # blue
-    'g': (0, 255, 0), # green
-    'r': (255, 0, 0), # red
-    'c': (0, 255, 255), # cyan
-    'm': (255, 0, 255), # magenta
-    'y': (255, 255, 0), # yellow
-    'k': (0, 0, 0), # black
-    'w': (255, 255, 255), # white
+    'b': (0, 0, 255),  # blue
+    'g': (0, 255, 0),  # green
+    'r': (255, 0, 0),  # red
+    'c': (0, 255, 255),  # cyan
+    'm': (255, 0, 255),  # magenta
+    'y': (255, 255, 0),  # yellow
+    'k': (0, 0, 0),  # black
+    'w': (255, 255, 255),  # white
 }
 
 MARKER_MAP = {

@@ -2,7 +2,6 @@ import os
 import re
 import sys
 import zmq
-import pwd
 import atexit
 import socket
 import shutil
@@ -10,13 +9,12 @@ import logging
 import tempfile
 import threading
 from collections import namedtuple
+from psmon import config
 # Queue module changed to queue in py3
 if sys.version_info < (3,):
-  import Queue as queue
+    import Queue as queue
 else:
-  import queue
-
-from psmon import config
+    import queue
 
 
 LOG = logging.getLogger(__name__)
@@ -112,7 +110,7 @@ class MessageHandler(object):
 
     @property
     def full(self):
-        return self.__mqueue.full() 
+        return self.__mqueue.full()
 
 
 class ZMQPublisher(object):
@@ -172,14 +170,14 @@ class ZMQPublisher(object):
                     # start the proxy receiver thread
                     self.proxy_thread.start()
                 self.initialized = True
-                LOG.debug('Initialized publisher proxy socket with endpoint: %s'%self.proxy_url)
+                LOG.debug('Initialized publisher proxy socket with endpoint: %s' % self.proxy_url)
             except zmq.ZMQError:
                 LOG.warning('Unable to bind proxy sockets for publisher - disabling!')
 
     def send(self, topic, data):
         if self.initialized:
             if topic.startswith(config.APP_RESERVED_TOPIC):
-                raise PublishError('Cannot publish data to internally reserved topic: %s'%topic)
+                raise PublishError('Cannot publish data to internally reserved topic: %s' % topic)
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug('Publishing data to topic: %s', topic)
             self.proxy_send_socket.send_string(topic, zmq.SNDMORE)
@@ -197,7 +195,7 @@ class ZMQPublisher(object):
                 topic = self.proxy_recv_socket.recv_string()
                 data = self.proxy_recv_socket.recv_pyobj()
                 if LOG.isEnabledFor(logging.DEBUG):
-                    LOG.debug('Received data on proxy socket for topic: %s'%topic)
+                    LOG.debug('Received data on proxy socket for topic: %s' % topic)
                 self.data_socket.send_string(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
                 self.data_socket.send_pyobj(data)
                 if topic not in self.cache:
@@ -215,28 +213,29 @@ class ZMQPublisher(object):
                     else:
                         topic = topic_msg[1:-1]
                         if LOG.isEnabledFor(logging.DEBUG):
-                            LOG.debug('Received subscription message for topic: %s'%topic)
+                            LOG.debug('Received subscription message for topic: %s' % topic)
                         try:
                             last_data = self.cache[topic]
                             if LOG.isEnabledFor(logging.DEBUG):
-                                LOG.debug('Found cached message to resend for topic: %s'%topic)
+                                LOG.debug('Found cached message to resend for topic: %s' % topic)
                             self.data_socket.send_string(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
                             self.data_socket.send_pyobj(last_data)
                         except KeyError:
                             if LOG.isEnabledFor(logging.DEBUG):
-                                LOG.debug('No cached message found for topic: %s'%topic)
+                                LOG.debug('No cached message found for topic: %s' % topic)
 
     def _initialize_icp(self):
         try:
             self.tempdir = tempfile.mkdtemp()
-            self.data_socket.bind('ipc://%s/data'%self.tempdir)
-            self.comm_socket.bind('ipc://%s/comm'%self.tempdir)
-            LOG.info('Initialized publisher. Data socket %s, Comm socket: %s', str(self.data_endpoint), self.comm_endpoint)
+            self.data_socket.bind('ipc://%s/data' % self.tempdir)
+            self.comm_socket.bind('ipc://%s/comm' % self.tempdir)
+            LOG.info('Initialized publisher. Data socket %s, Comm socket: %s',
+                     str(self.data_endpoint), self.comm_endpoint)
             return True
         except zmq.ZMQError:
             LOG.warning('Unable to bind local sockets for publisher - disabling!')
             return False
-    
+
     def _initialize_tcp(self, port):
         offset = 0
         while offset < config.APP_BIND_ATTEMPT:
@@ -270,7 +269,7 @@ class ZMQPublisher(object):
                 # make sure to clean up the first bind which succeeded in this case
                 self._unbind(self.data_socket, port)
                 return 2
-        except zmq.ZMQError as e:
+        except zmq.ZMQError:
             return 1
 
     def _bind(self, sock, port):
@@ -292,7 +291,7 @@ class ZMQSubscriber(object):
         self.topic_str = self.client_info.topic + config.ZMQ_TOPIC_DELIM_CHAR
         # Handle byte versus unicode strings for the topic
         if isinstance(self.topic_str, bytes):
-          self.topic_str = self.topic_str.decode('ascii')
+            self.topic_str = self.topic_str.decode('ascii')
         self.data_socket.setsockopt_string(zmq.SUBSCRIBE, self.topic_str)
         self.data_socket.set_hwm(self.client_info.buffer)
         self.comm_socket = self.context.socket(zmq.REQ)
@@ -310,7 +309,7 @@ class ZMQSubscriber(object):
         sock.connect(con_str)
 
     def data_recv(self, flags=0):
-        topic = self.data_socket.recv(flags)
+        self.data_socket.recv(flags)
         return self.data_socket.recv_pyobj(flags)
 
     def get_socket_gen(self):
@@ -340,7 +339,7 @@ class ZMQListener(object):
 
     def __init__(self, comm_socket):
         self._reset = config.RESET_REQ_HEADER
-        self._signal = re.compile(config.RESET_REQ_STR%'(.*)')
+        self._signal = re.compile(config.RESET_REQ_STR % '(.*)')
         self._reply = config.RESET_REP_STR
         self.__comm_socket = comm_socket
         self.__reset_flag = threading.Event()
@@ -361,10 +360,10 @@ class ZMQListener(object):
         if name in self.__message_handler:
             if LOG.isEnabledFor(logging.WARN):
                 LOG.warning('Attempted to register message handler which already exists: %s', name)
-            raise ValueError('Message handler \'%s\' already registered'%name)
+            raise ValueError('Message handler \'%s\' already registered' % name)
         handler = self.__message_handler[name] = MessageHandler(name, limit, is_pyobj)
         if LOG.isEnabledFor(logging.INFO):
-            LOG.info('Sucessfully registered message handler: %s'%name)
+            LOG.info('Sucessfully registered message handler: %s' % name)
         return handler
 
     def get_handler(self, name):
@@ -378,7 +377,7 @@ class ZMQListener(object):
                 signal_matcher = self._signal.match(msg)
                 if signal_matcher is not None:
                     self.set_flag()
-                    self.send_reply(self._reset, self._reply%signal_matcher.group(1))
+                    self.send_reply(self._reset, self._reply % signal_matcher.group(1))
                     if LOG.isEnabledFor(logging.INFO):
                         LOG.info('Received valid reset request: %s', msg)
                 else:
@@ -421,8 +420,8 @@ class ZMQListener(object):
 class ZMQRequester(object):
     def __init__(self, comm_socket):
         self._reset = config.RESET_REQ_HEADER
-        self._request = config.RESET_REQ_STR%socket.gethostname()
-        self._req_reply = config.RESET_REP_STR%socket.gethostname()
+        self._request = config.RESET_REQ_STR % socket.gethostname()
+        self._req_reply = config.RESET_REP_STR % socket.gethostname()
         self.__comm_socket = comm_socket
         self.__comm_lock = threading.Lock()
         self.__pending_flag = threading.Event()
@@ -444,7 +443,7 @@ class ZMQRequester(object):
                 rep_msg = self.__comm_socket.recv_string()
 
             return rep_msg
-        
+
     def reset_signal(self):
         # check to see if there is another pending reset req
         if not self.__pending_flag.is_set():

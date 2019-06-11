@@ -1,14 +1,10 @@
-import socket
 import logging
-import threading
-
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
 import psmon.plotmpl as psplot
 from psmon.plotmpl import MplClientTypeError
-from psmon import app, config
+from psmon import app
 
 
 LOG = logging.getLogger(__name__)
@@ -40,7 +36,7 @@ def main(client_info, plot_info):
     # start the plotting rendering routine
     try:
         plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)
-        plot_ani = plot.animate()
+        plot_ani = plot.animate()  # noqa: F841
     except MplClientTypeError as err:
         LOG.critical('Server returned datagram with an unsupported type: %s', err)
         return 1
@@ -57,8 +53,9 @@ def main(client_info, plot_info):
         button_cnt = 0
         auto_zoom_buttons = []
         for sub_ax in plot.ax:
-            auto_zoom_button = Button(plt.axes([az_xpos + button_cnt * (az_xpos + az_xlen_multi) , az_ypos, az_xlen_multi, az_ylen]),
-                                      'Auto Zoom %d' % (button_cnt+1))
+            auto_zoom_button = Button(
+                plt.axes([az_xpos + button_cnt * (az_xpos + az_xlen_multi), az_ypos, az_xlen_multi, az_ylen]),
+                'Auto Zoom %d' % (button_cnt + 1))
             auto_zoom_button.on_clicked(sub_ax.autoscale)
             auto_zoom_buttons.append(auto_zoom_button)
             button_cnt += 1
@@ -74,7 +71,7 @@ def main(client_info, plot_info):
 
     try:
         plt.show()
-    except:
+    except Exception:
         # sort of ugly but this can throw all kinds of errors when closing a window
         pass
 

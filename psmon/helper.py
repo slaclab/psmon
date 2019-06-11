@@ -123,7 +123,8 @@ class XYPlotHelper(Helper):
 
 
 class HistHelper(Helper):
-    def __init__(self, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None, format='-', pubrate=None, publisher=None):
+    def __init__(self, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None,
+                 format='-', pubrate=None, publisher=None):
         super(HistHelper, self).__init__(topic, title, pubrate, publisher)
         self.nbins = int(nbins)
         self.bmin = float(bmin)

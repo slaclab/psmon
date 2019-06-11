@@ -27,7 +27,7 @@ def parse_cmdline():
         '--server',
         metavar='SERVER',
         default=config.APP_SERVER,
-        help='the host name of the server (default: %s)'%config.APP_SERVER
+        help='the host name of the server (default: %s)' % config.APP_SERVER
     )
 
     parser.add_argument(
@@ -36,7 +36,7 @@ def parse_cmdline():
         metavar='PORT',
         type=int,
         default=config.APP_PORT,
-        help='the tcp port of the server (default: %d)'%config.APP_PORT
+        help='the tcp port of the server (default: %d)' % config.APP_PORT
     )
 
     parser.add_argument(
@@ -45,7 +45,7 @@ def parse_cmdline():
         metavar='RATE',
         type=float,
         default=config.APP_RATE,
-        help='update rate of the histogram in Hz (default: %.2fHz)'%config.APP_RATE
+        help='update rate of the histogram in Hz (default: %.2fHz)' % config.APP_RATE
     )
 
     parser.add_argument(
@@ -54,7 +54,7 @@ def parse_cmdline():
         metavar='BUFFER',
         type=int,
         default=config.APP_BUFFER,
-        help='the size in messages of recieve buffer (default: %d)'%config.APP_BUFFER
+        help='the size in messages of recieve buffer (default: %d)' % config.APP_BUFFER
     )
 
     parser.add_argument(
@@ -109,7 +109,7 @@ def parse_cmdline():
         '--interpolation',
         metavar='INTERPOLATION',
         default=config.APP_IMG_INTERPOLATION,
-        help='the interpolation type for images (default: \'%s\')'%config.APP_IMG_INTERPOLATION
+        help='the interpolation type for images (default: \'%s\')' % config.APP_IMG_INTERPOLATION
     )
 
     parser.add_argument(
@@ -159,7 +159,7 @@ def parse_cmdline():
         '--client',
         metavar='CLIENT',
         default=config.APP_CLIENT,
-        help='the client backend used for rendering (default: %s)'%config.APP_CLIENT
+        help='the client backend used for rendering (default: %s)' % config.APP_CLIENT
     )
 
     parser.add_argument(
@@ -174,20 +174,20 @@ def parse_cmdline():
         '--log',
         metavar='LOG',
         default=config.LOG_LEVEL,
-        help='the logging level of the client (default %s)'%config.LOG_LEVEL
+        help='the logging level of the client (default %s)' % config.LOG_LEVEL
     )
 
     return parser.parse_args()
 
 
 def plot_client(client_info, plot_info):
-    render_mod = __import__('psmon.client%s'%client_info.renderer, fromlist=['main'])
+    render_mod = __import__('psmon.client%s' % client_info.renderer, fromlist=['main'])
     sys.exit(render_mod.main(client_info, plot_info))
 
 
 def topic_client(client_info, plot_info):
     # try to find out the server and port number
-    name_parse = re.match('tcp://(?P<server>\S+):(?P<port>\d+)', client_info.data_socket_url)
+    name_parse = re.match(r'tcp://(?P<server>\S+):(?P<port>\d+)', client_info.data_socket_url)
     if name_parse:
         server = name_parse.group('server')
         port = name_parse.group('port')
@@ -200,10 +200,10 @@ def topic_client(client_info, plot_info):
     LOG.info('Topic list successfully retrieved from %s', server)
     # Now print the topic list
     LOG.info("Available topics on %s: %s", server, topics)
-    
+
 
 def spawn_process(client_info, plot_info, target=plot_client):
-    proc = mp.Process(name='%s-client'%client_info.topic, target=target, args=(client_info, plot_info))
+    proc = mp.Process(name='%s-client' % client_info.topic, target=target, args=(client_info, plot_info))
     proc.daemon = client_info.daemon
     proc.start()
 
@@ -240,11 +240,19 @@ def main():
         if args.topics:
             proc_list = []
             for topic in args.topics:
-                client_info = app.ClientInfo(data_socket_url, comm_socket_url, args.buffer, args.rate, args.recv_limit, topic, args.client, True)
+                client_info = app.ClientInfo(
+                    data_socket_url,
+                    comm_socket_url,
+                    args.buffer,
+                    args.rate,
+                    args.recv_limit,
+                    topic,
+                    args.client,
+                    True)
                 LOG.info('Starting client for topic: %s', topic)
                 proc = spawn_process(client_info, plot_info)
                 proc_list.append(proc)
-    
+
             # wait for all the children to exit
             failed_client = False
             for proc in proc_list:
@@ -262,12 +270,21 @@ def main():
                 return 1
         else:
             LOG.info('No topics specified - attempting to retrieve list of topics from the server')
-            client_info = app.ClientInfo(data_socket_url, comm_socket_url, args.buffer, args.rate, args.recv_limit, config.APP_TOPIC_LIST, args.client, True)
+            client_info = app.ClientInfo(
+                data_socket_url,
+                comm_socket_url,
+                args.buffer,
+                args.rate,
+                args.recv_limit,
+                config.APP_TOPIC_LIST,
+                args.client,
+                True)
             proc = spawn_process(client_info, plot_info, target=topic_client)
             proc.join(config.APP_TIMEOUT)
             # check the return code of the topic process - if it has hung it will be 'None'
             if proc.exitcode != 0:
-                LOG.error('Failed to retrieve topic information from %s on port %d - server may be down!', args.server, args.port)
+                LOG.error('Failed to retrieve topic information from %s on port %d - server may be down!',
+                          args.server, args.port)
                 return 1
 
     except KeyboardInterrupt:

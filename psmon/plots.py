@@ -25,7 +25,7 @@ class MultiPlot(object):
     arbitrary number of Plot objects
 
     Optional arguments
-    - ncols: indicates to the client the number of columns to be used for 
+    - ncols: indicates to the client the number of columns to be used for
             displaying the plots
     - use_windows: tells the client to render the individual plots in separate
             windows if that feature is supported by the client
@@ -83,7 +83,8 @@ class Image(Plot):
     A data container for image data for the psmon client
     """
 
-    def __init__(self, ts, title, image, xlabel=None, ylabel=None, aspect_ratio=None, aspect_lock=True, pos=None, scale=None):
+    def __init__(self, ts, title, image, xlabel=None, ylabel=None,
+                 aspect_ratio=None, aspect_lock=True, pos=None, scale=None):
         super(Image, self).__init__(ts, title, xlabel, ylabel)
         self.image = image
         self.aspect_ratio = aspect_ratio
@@ -97,7 +98,7 @@ class Image(Plot):
         This attribute is True if this Image object is valid
 
         Conditions:
-         - The 'image' attribute of must not be None 
+         - The 'image' attribute of must not be None
         """
         return self.image is not None
 
@@ -107,7 +108,8 @@ class Hist(Plot):
     A data container for 1-d histogram data for the psmon client
     """
 
-    def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, leg_label=None, leg_offset=None, formats='-', fills=True):
+    def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None,
+                 leg_label=None, leg_offset=None, formats='-', fills=True):
         super(Hist, self).__init__(ts, title, xlabel, ylabel)
         self.bins = bins
         self.values = values
