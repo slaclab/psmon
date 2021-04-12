@@ -45,9 +45,6 @@ def main(client_info, plot_info):
         LOG.exception('Server returned an unknown datatype: %s', type(init_data))
         return 1
 
-    # Disable/enable scipy.weave based on configuration settings
-    pg.setConfigOption("useWeave", config.PYQT_USE_WEAVE)
-
     # start the QtApp
     qtapp = QtGui.QApplication([])
     # set widget background/foreground color if specified
