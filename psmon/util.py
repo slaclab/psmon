@@ -1,5 +1,6 @@
 import os
 import sys
+import datetime
 import numpy as np
 import collections
 from itertools import chain
@@ -109,6 +110,10 @@ def merge_dicts(base, updates):
     new_dict = base.copy()
     new_dict.update(updates)
     return new_dict
+
+
+def ts_to_str(ts):
+    return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 
 
 @contextmanager

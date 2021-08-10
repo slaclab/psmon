@@ -8,7 +8,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
 
 from psmon import config
-from psmon.util import arg_inflate_tuple, window_ratio, merge_dicts, check_data
+from psmon.util import arg_inflate_tuple, window_ratio, merge_dicts, check_data, ts_to_str
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 from psmon.format import parse_fmt_xyplot, parse_fmt_hist, parse_fmt_leg
 
@@ -39,6 +39,8 @@ class PlotClient(object):
     def __init__(self, init, framegen, info, rate, **kwargs):
         # set the title
         self.title = init.title
+        self.xdate = init.xdate
+        self.ydate = init.ydate
         if 'figwin' in kwargs:
             self.is_win = False
             self.fig_win = kwargs['figwin']
@@ -53,10 +55,13 @@ class PlotClient(object):
             self.fig_win.setWindowTitle(init.title)
             self.fig_win.show()
             self.fig_layout = self.fig_win.ci
+        self.plot_kwargs = {}
+        # configure x/y axis as dates if requested
+        self.set_date_axes()
         # create a sublayout for the plot itself
         self.plot_layout = self.fig_layout.addLayout()
         self._set_row_stretch(1)
-        self.plot_view = self.plot_layout.addPlot()
+        self.plot_view = self.plot_layout.addPlot(**self.plot_kwargs)
         # creat a sublayout under the plot for info/buttons
         self.fig_layout.nextRow()
         self.info_layout = self.fig_layout.addLayout()
@@ -198,8 +203,21 @@ class PlotClient(object):
     def _set_row_stretch(self, val):
         self.fig_layout.layout.setRowStretchFactor(self.fig_layout.currentRow, val)
 
+    def set_date_axis(self, name):
+        if 'axisItems' not in self.plot_kwargs:
+            self.plot_kwargs['axisItems'] = {}
+        self.plot_kwargs['axisItems'][name] = pg.DateAxisItem(orientation=name)
+
+    def set_date_axes(self):
+        if self.xdate:
+            self.set_date_axis('bottom')
+        if self.ydate:
+            self.set_date_axis('left')
+
     def cursor_hover_evt_sub(self, x_pos, y_pos):
-        self.info_label.setText('x=%.5g, y=%.5g' % (x_pos, y_pos), size='10pt')
+        fmt = 'x=%s, y=%s' % ('%s' if self.xdate else '%.5g', '%s' if self.ydate else '%.5g')
+        vals = (ts_to_str(x_pos) if self.xdate else x_pos, ts_to_str(y_pos) if self.ydate else y_pos)
+        self.info_label.setText(fmt % vals, size='10pt')
 
     def cursor_hover_evt(self, evt):
         pos = evt[0]

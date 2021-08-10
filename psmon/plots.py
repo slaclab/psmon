@@ -2,11 +2,13 @@ class Plot(object):
     """
     A data container representing a Plot object for the psmon client
     """
-    def __init__(self, ts, title, xlabel, ylabel):
+    def __init__(self, ts, title, xlabel, ylabel, xdate=False, ydate=False):
         self.ts = ts
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
+        self.xdate = xdate
+        self.ydate = ydate
 
     @property
     def valid(self):
@@ -85,7 +87,7 @@ class Image(Plot):
 
     def __init__(self, ts, title, image, xlabel=None, ylabel=None,
                  aspect_ratio=None, aspect_lock=True, pos=None, scale=None):
-        super(Image, self).__init__(ts, title, xlabel, ylabel)
+        super(Image, self).__init__(ts, title, xlabel, ylabel, False, False)
         self.image = image
         self.aspect_ratio = aspect_ratio
         self.aspect_lock = aspect_lock
@@ -109,8 +111,9 @@ class Hist(Plot):
     """
 
     def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None,
-                 leg_label=None, leg_offset=None, formats='-', fills=True):
-        super(Hist, self).__init__(ts, title, xlabel, ylabel)
+                 leg_label=None, leg_offset=None, formats='-', fills=True,
+                 xdate=False, ydate=False):
+        super(Hist, self).__init__(ts, title, xlabel, ylabel, xdate, ydate)
         self.bins = bins
         self.values = values
         self.leg_label = leg_label
@@ -134,8 +137,10 @@ class XYPlot(Plot):
     A data container for xy scatter plot data for the psmon client
     """
 
-    def __init__(self, ts, title, xdata, ydata, xlabel=None, ylabel=None, leg_label=None, leg_offset=None, formats='-'):
-        super(XYPlot, self).__init__(ts, title, xlabel, ylabel)
+    def __init__(self, ts, title, xdata, ydata, xlabel=None, ylabel=None,
+                 leg_label=None, leg_offset=None, formats='-',
+                 xdate=False, ydate=False):
+        super(XYPlot, self).__init__(ts, title, xlabel, ylabel, xdate, ydate)
         self.xdata = xdata
         self.ydata = ydata
         self.leg_label = leg_label
