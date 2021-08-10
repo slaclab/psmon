@@ -10,7 +10,7 @@ from matplotlib.axes._base import _process_plot_format
 
 from psmon import config
 from psmon.util import is_py_iter, arg_inflate_flat, arg_inflate_tuple, inflate_input, check_data
-from psmon.util import window_ratio
+from psmon.util import window_ratio, ts_to_dt
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
@@ -53,6 +53,8 @@ class PlotClient(object):
         self.framegen = framegen
         self.rate_ms = rate * 1000
         self.multi_plot = False
+        self.xdate = init.xdate
+        self.ydate = init.ydate
 
     def update_sub(self, data):
         pass
@@ -132,7 +134,7 @@ class PlotClient(object):
         inflated_args = arg_inflate_tuple(1, check_data(x_vals), check_data(y_vals), new_fmts)
         for index, (plot, data_tup, old_fmt) in enumerate(zip(plots, inflated_args, old_fmts)):
             x_val, y_val, new_fmt = data_tup
-            plot.set_data(x_val, y_val)
+            plot.set_data(ts_to_dt(x_val) if self.xdate else x_val, ts_to_dt(y_val) if self.ydate else y_val)
             if new_fmt != old_fmt:
                 # parse the format string
                 linestyle, marker, color = _process_plot_format(new_fmt)
@@ -250,9 +252,17 @@ class ImageClient(PlotClient):
 class HistClient(PlotClient):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
+        # convert to datetime if requested
+        bins = ts_to_dt(init_hist.bins) if self.xdate else init_hist.bins
+        values = ts_to_dt(init_hist.values) if self.ydate else init_hist.values
         # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
-        corrected_bins = self.correct_bins(init_hist.bins, init_hist.values)
-        plot_args = arg_inflate_flat(1, corrected_bins, init_hist.values, init_hist.formats)
+        corrected_bins = self.correct_bins(bins, values)
+        plot_args = arg_inflate_flat(
+            1,
+            corrected_bins,
+            values,
+            init_hist.formats
+        )
         self.hists = self.ax.plot(*plot_args, drawstyle=config.MPL_HISTO_STYLE)
         self.fill(corrected_bins, init_hist.values, init_hist.fills)
         self.formats = inflate_input(init_hist.formats, init_hist.values)
@@ -314,7 +324,12 @@ class HistClient(PlotClient):
 class XYPlotClient(PlotClient):
     def __init__(self, init_plot, datagen, info, rate=1, **kwargs):
         super(XYPlotClient, self).__init__(init_plot, datagen, info, rate, **kwargs)
-        plot_args = arg_inflate_flat(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
+        plot_args = arg_inflate_flat(
+            1,
+            ts_to_dt(init_plot.xdata) if self.xdate else init_plot.xdata,
+            ts_to_dt(init_plot.ydata) if self.ydate else init_plot.ydata,
+            init_plot.formats
+        )
         self.plots = self.ax.plot(*plot_args)
         self.formats = inflate_input(init_plot.formats, init_plot.ydata)
         self.set_aspect()

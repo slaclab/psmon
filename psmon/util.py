@@ -1,8 +1,8 @@
 import os
 import sys
-import datetime
 import numpy as np
 import collections
+import datetime as dt
 from itertools import chain
 from contextlib import contextmanager
 # For Python 3 - builtin zip returns generator
@@ -14,7 +14,7 @@ else:
 
 def is_py_iter(obj):
     """
-    Check if the object is an iterable python object excluding ndarrays
+    Check if the object is an iterable python object excluding ndarrays and strings
     """
     return hasattr(obj, '__iter__') and not isinstance(obj, (str, np.ndarray))
 
@@ -112,8 +112,22 @@ def merge_dicts(base, updates):
     return new_dict
 
 
-def ts_to_str(ts):
-    return datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+def ts_to_str(timestamps):
+    if is_py_iter(timestamps):
+        return [ts_to_str(ts) for ts in timestamps]
+    elif isinstance(timestamps, np.ndarray):
+        return np.array([ts_to_str(ts) for ts in timestamps])
+    else:
+        return dt.datetime.fromtimestamp(timestamps).strftime('%Y-%m-%d %H:%M:%S')
+
+
+def ts_to_dt(timestamps):
+    if is_py_iter(timestamps):
+        return [ts_to_dt(ts) for ts in timestamps]
+    elif isinstance(timestamps, np.ndarray):
+        return np.array([ts_to_dt(ts) for ts in timestamps])
+    else:
+        return dt.datetime.fromtimestamp(timestamps)
 
 
 @contextmanager

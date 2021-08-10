@@ -153,8 +153,8 @@ class _Publish(object):
         """
         Block until all active local clients have exitted.
         """
-        for client in self.active_clients.values():
-            client.join()
+        for active_client in self.active_clients.values():
+            active_client.join()
 
 
 sys.modules[__name__] = _Publish()
