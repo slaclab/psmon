@@ -149,5 +149,12 @@ class _Publish(object):
         """
         self._reset_listener.clear_flag()
 
+    def wait(self):
+        """
+        Block until all active local clients have exitted.
+        """
+        for client in self.active_clients.values():
+            client.join()
+
 
 sys.modules[__name__] = _Publish()

@@ -15,7 +15,7 @@ def is_py_iter(obj):
     """
     Check if the object is an iterable python object excluding ndarrays
     """
-    return hasattr(obj, '__iter__') and not isinstance(obj, np.ndarray)
+    return hasattr(obj, '__iter__') and not isinstance(obj, (str, np.ndarray))
 
 
 def py_length(obj):
