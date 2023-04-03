@@ -163,7 +163,7 @@ class ZMQPublisher(object):
         if sock_bound:
             try:
                 # if the proxy thread is not already running start it
-                if not self.proxy_thread.isAlive():
+                if not self.proxy_thread.is_alive():
                     self.proxy_send_socket.bind(self.proxy_url)
                     self.proxy_recv_socket.connect(self.proxy_url)
                     self.proxy_thread.daemon = True
@@ -413,7 +413,7 @@ class ZMQListener(object):
         self.__reset_flag.clear()
 
     def start(self):
-        if not self.__thread.isAlive():
+        if not self.__thread.is_alive():
             self.__thread.start()
 
 
