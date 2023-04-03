@@ -6,7 +6,7 @@ from psmon import app, config, util
 # Suppress mpi setup output
 with util.redirect_stdout():
     import pyqtgraph as pg
-    from pyqtgraph.Qt import QtCore, QtGui
+    from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
     import psmon.plotpyqt as psplot
     from psmon.plotpyqt import PyQtClientTypeError
 
@@ -46,7 +46,7 @@ def main(client_info, plot_info):
         return 1
 
     # start the QtApp
-    qtapp = QtGui.QApplication([])
+    qtapp = QtWidgets.QApplication([])
     # set widget background/foreground color if specified
     set_color_opt('background', plot_info.bkg_col)
     set_color_opt('foreground', plot_info.fore_col)
@@ -70,6 +70,6 @@ def main(client_info, plot_info):
     # reset_req = app.ZMQRequester(zmqsub.comm_socket)
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QtGui.QApplication.instance().exec_()
+        QtWidgets.QApplication.instance().exec_()
 
     return 0
