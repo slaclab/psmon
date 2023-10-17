@@ -161,6 +161,9 @@ class ZMQPublisher(object):
 
         # connect the proxy_sockets if setup of other socks succeeded
         if sock_bound:
+            if isinstance(sock_bound, int):
+                # update to new port returned by _initialize_tcp (retry until found)
+                self.port = sock_bound
             try:
                 # if the proxy thread is not already running start it
                 if not self.proxy_thread.is_alive():
@@ -248,7 +251,8 @@ class ZMQPublisher(object):
                     LOG.info(output_str, '', port_try, port_try + self.comm_offset)
                 else:
                     LOG.warning(output_str, ' (alternate ports)', port_try, port_try + self.comm_offset)
-                return True
+                # Returns available port
+                return port_try
             elif result == 1:
                 LOG.warning('Unable to bind publisher to data port: %d', port_try)
             else:
