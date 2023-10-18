@@ -48,7 +48,8 @@ class PlotClient(object):
             # this is needed for older versions of matplotlib where axis objects don't have set_facecolor
             if not hasattr(self.ax, 'set_facecolor'):
                 self.ax.set_axis_bgcolor(info.bkg_col or config.MPL_AXES_BKG_COLOR)
-            self.figure.canvas.set_window_title(init.title)
+            if self.figure.canvas.manager is not None:
+                self.figure.canvas.manager.set_window_title(init.title)
         self.info = info
         self.set_title(init.ts)
         self.set_labels(init.xlabel, init.ylabel)
@@ -184,7 +185,8 @@ class MultiPlotClient(object):
         )
         # flatten the axes array returned by suplot
         self.ax = self.ax.flatten()
-        self.figure.canvas.set_window_title(init.title)
+        if self.figure.canvas.manager is not None:
+            self.figure.canvas.manager.set_window_title(init.title)
         self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax))
                       for data_obj, subax in zip(init.data_con, self.ax)]
         self.framegen = framegen
