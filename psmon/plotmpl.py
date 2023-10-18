@@ -1,7 +1,10 @@
 import sys
 import math
 import logging
-import collections
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -83,7 +86,7 @@ class PlotClient(object):
         self.set_axis_label(self.ax.set_ylabel, ylabel)
 
     def set_axis_label(self, axis_label_func, axis_label_data):
-        if isinstance(axis_label_data, collections.Mapping):
+        if isinstance(axis_label_data, Mapping):
             if 'axis_title' in axis_label_data:
                 label_str = axis_label_data['axis_title']
                 if 'axis_units' in axis_label_data:

@@ -1,8 +1,11 @@
 import sys
 import math
 import logging
-import collections
 import numpy as np
+try:
+    from collections.abc import Mapping
+except ImportError:
+    from collections import Mapping
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore
@@ -147,7 +150,7 @@ class PlotClient(object):
         - font-weight
         - etc...
         """
-        if isinstance(axis_label_data, collections.Mapping):
+        if isinstance(axis_label_data, Mapping):
             arg_list = ['text', 'units', 'unitPrefix']
             axis_args = [axis_label_data.get(value, None) for value in arg_list]
             axis_kwargs = {key: value for key, value in axis_label_data.items() if key not in arg_list}
