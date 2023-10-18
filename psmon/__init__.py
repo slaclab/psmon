@@ -2,7 +2,7 @@ import logging as pslogging
 from psmon import config
 
 
-__version__ = '1.0.2'
+__version__ = '1.0.9'
 
 
 def log_level_parse(log_level):

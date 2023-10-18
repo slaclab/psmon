@@ -21,7 +21,7 @@ if hasattr(sys, 'ps1'):
 elif sys.flags.interactive:
     APP_INTERACTIVE = True
 APP_SERVER = 'localhost'
-APP_PORT = 12301
+APP_PORT = 12323
 APP_COMM_OFFSET = 1
 APP_TIMEOUT = 5.0
 APP_RATE = 5.0

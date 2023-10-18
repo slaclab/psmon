@@ -6,7 +6,7 @@ from psmon import app, config, util
 # Suppress mpi setup output
 with util.redirect_stdout():
     import pyqtgraph as pg
-    from pyqtgraph.Qt import QtCore, QtGui, QtWidgets
+    from pyqtgraph.Qt import QtCore, QtWidgets
     import psmon.plotpyqt as psplot
     from psmon.plotpyqt import PyQtClientTypeError
 
