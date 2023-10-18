@@ -123,7 +123,6 @@ class ZMQPublisher(object):
         self.proxy_url = "inproc://send-proxy"
         self.proxy_thread = threading.Thread(target=self._send_proxy)
         self.comm_offset = comm_offset
-        self.port = None
         self.initialized = False
         self.tempdir = None
         self.cache = {
@@ -162,8 +161,6 @@ class ZMQPublisher(object):
 
         # connect the proxy_sockets if setup of other socks succeeded
         if sock_bound:
-            # update to new port returned by _initialize_tcp/icp (retry until found)
-            self.port = sock_bound
             try:
                 # if the proxy thread is not already running start it
                 if not self.proxy_thread.is_alive():
@@ -174,6 +171,8 @@ class ZMQPublisher(object):
                     self.proxy_thread.start()
                 self.initialized = True
                 LOG.debug('Initialized publisher proxy socket with endpoint: %s' % self.proxy_url)
+                # pass new port returned by _initialize_tcp/icp (retry until found)
+                return sock_bound
             except zmq.ZMQError:
                 LOG.warning('Unable to bind proxy sockets for publisher - disabling!')
 
