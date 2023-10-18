@@ -111,6 +111,8 @@ class _Publish(object):
         if local is not None:
             self.local = local
         self._publisher.initialize(self.port, self.client_opts.buffer, self.local)
+        # update to the port publisher found available
+        self.port = self._publisher.port
         self._reset_listener.start()
         # turn off further autoconnect attempts
         self.disabled = True
