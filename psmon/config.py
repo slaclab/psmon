@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 from collections import namedtuple
@@ -29,7 +30,7 @@ APP_BUFFER = 5
 APP_CLIENT = 'pyqt'
 APP_RUN_DEFAULT = '12'
 APP_EXP_DEFAULT = 'xppb0114'
-APP_BIND_ATTEMPT = 32
+APP_BIND_ATTEMPT = int(os.getenv("PSMON_BIND_ATTEMPT", 32))
 APP_RECV_LIMIT = 25
 APP_IMG_INTERPOLATION = 'none'
 APP_LOCAL = False
