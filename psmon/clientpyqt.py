@@ -51,8 +51,8 @@ def main(client_info, plot_info):
     set_color_opt('background', plot_info.bkg_col)
     set_color_opt('foreground', plot_info.fore_col)
     # get geometry of current screen at set max window geo
-    qtdesk = qtapp.desktop()
-    screen_geo = qtdesk.availableGeometry()
+    qtscreen = qtapp.primaryScreen()
+    screen_geo = qtscreen.availableGeometry()
     config.PYQT_LARGE_WIN = config.Resolution(
         min(screen_geo.width(), config.PYQT_LARGE_WIN.x),
         min(screen_geo.height(), config.PYQT_LARGE_WIN.y),
