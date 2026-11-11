@@ -1,10 +1,15 @@
 import os
 import sys
 import numpy as np
-import collections
+
+try:
+    from collections.abc import Sequence
+except ImportError:  # Python 2
+    from collections import Sequence
 import datetime as dt
 from itertools import chain
 from contextlib import contextmanager
+
 # For Python 3 - builtin zip returns generator
 if sys.version_info < (3,):
     from itertools import izip
@@ -16,14 +21,14 @@ def is_py_iter(obj):
     """
     Check if the object is an iterable python object excluding ndarrays and strings
     """
-    return hasattr(obj, '__iter__') and not isinstance(obj, (str, np.ndarray))
+    return hasattr(obj, "__iter__") and not isinstance(obj, (str, np.ndarray))
 
 
 def py_length(obj):
     """
     Returns of the length of the object. Always '1' for scalar types
     """
-    if isinstance(obj, (collections.Sequence, np.ndarray)):
+    if isinstance(obj, (Sequence, np.ndarray)):
         return len(obj)
     else:
         return 1
@@ -36,7 +41,7 @@ def convert_to_array(obj):
     """
     if isinstance(obj, np.ndarray):
         return obj
-    elif isinstance(obj, collections.Sequence):
+    elif isinstance(obj, Sequence):
         return np.array(obj)
     else:
         return np.array([obj])
@@ -47,8 +52,8 @@ def check_data(obj):
     Checks that the deepest nested sequence object is a numpy array and
     converts the object if needed.
     """
-    if isinstance(obj, collections.Sequence):
-        if obj and (isinstance(obj[0], np.ndarray) or isinstance(obj[0], collections.Sequence)):
+    if isinstance(obj, Sequence):
+        if obj and (isinstance(obj[0], np.ndarray) or isinstance(obj[0], Sequence)):
             return [convert_to_array(sub_obj) for sub_obj in obj]
         else:
             return convert_to_array(obj)
@@ -88,8 +93,8 @@ def inflate_input(input, input_ref):
 
 
 def make_bins(nbins, bmin, bmax):
-    step = (bmax - bmin)/nbins
-    return np.arange(bmin, bmax + step, step)[:nbins+1]
+    step = (bmax - bmin) / nbins
+    return np.arange(bmin, bmax + step, step)[: nbins + 1]
 
 
 def window_ratio(min_res, max_res):
@@ -98,11 +103,12 @@ def window_ratio(min_res, max_res):
         pref_y = min_res.y * nrows
 
         if pref_x > max_res.x or pref_y > max_res.y:
-            num = min(max_res.x/float(ncols), max_res.y/float(nrows))
+            num = min(max_res.x / float(ncols), max_res.y / float(nrows))
             pref_x = max(ncols * num, min_res.x)
             pref_y = max(nrows * num, min_res.y)
 
         return int(pref_x), int(pref_y)
+
     return window_ratio_calc
 
 
@@ -118,7 +124,7 @@ def ts_to_str(timestamps):
     elif isinstance(timestamps, np.ndarray):
         return np.array([ts_to_str(ts) for ts in timestamps])
     else:
-        return dt.datetime.fromtimestamp(timestamps).strftime('%Y-%m-%d %H:%M:%S')
+        return dt.datetime.fromtimestamp(timestamps).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def ts_to_dt(timestamps):
@@ -136,7 +142,7 @@ def redirect_stdout():
     sys.stderr.flush()
     stdoutfd = os.dup(sys.stdout.fileno())
     stderrfd = os.dup(sys.stderr.fileno())
-    with open(os.devnull, 'wb') as devnull:
+    with open(os.devnull, "wb") as devnull:
         os.dup2(devnull.fileno(), sys.stdout.fileno())
         os.dup2(devnull.fileno(), sys.stderr.fileno())
         try:
